@@ -1,4 +1,5 @@
 import heapq
+import os
 from collections import deque, defaultdict
 
 class Node:
@@ -9,18 +10,19 @@ class Node:
 
 def FIFO(k, m, requests):
     hit, miss = 0, 0
-    q = []
+    q = deque()
     hold = set()
     for r in requests:
         if r in hold:
             hit += 1
         else:
             miss += 1
-            if len(q) == k:
-                to_remove = q.pop(0) #pretend this is a queue using a q library
+            if len(hold) >= k:
+                to_remove = q.popleft()
                 hold.remove(to_remove)
             q.append(r)
             hold.add(r)
+    return miss
 
 def LRU(k, m, requests):
     hit, miss, size = 0, 0, 0
@@ -54,11 +56,12 @@ def LRU(k, m, requests):
         hold[r].prev = secondary
         hold["start"].prev = hold[r]
         hold[r].next = hold["start"]
+    return miss
           
 def OPTFF(k, m, requests):
     cache = set()
     heap = []
-    hit, misses = 0, 0
+    hit, miss = 0, 0
     
     #to make item -> array of index where it occur pair
     fut_idx = defaultdict(deque)
@@ -77,7 +80,7 @@ def OPTFF(k, m, requests):
             hit += 1
             heapq.heappush(heap, (-next_idx, item))
         else:
-            misses += 1
+            miss += 1
             if len(cache) >= k:
                 #we pop  the items with the furthest next_idx until we pop one that's in the cache
                 while True:
@@ -85,8 +88,39 @@ def OPTFF(k, m, requests):
                     if victim in cache: # Check for stale heap entries
                         cache.remove(victim)
                         break
-            
-        # INSERT
         cache.add(item)
         heapq.heappush(heap, (-next_idx, item))
-    
+    return miss
+
+def run_benchmarks():
+    # write all of the files that need to be tested here V
+    files = ["example.in", "test1.in", "test2.in", "test3.in", "test4.in", "test5.in", "test6.in",  "test7.in"]
+    for filename in files:
+        filename = "../tests/" + filename
+        print(f"--- {filename} ---")
+        try:
+            with open(filename, 'r') as f:
+                # Read all lines and filter out empty ones
+                lines = [line.strip() for line in f if line.strip()]
+                if len(lines) < 2:
+                    continue
+                
+                # First line: k m
+                header = lines[0].split()
+                k, m = int(header[0]), int(header[1])
+                
+                # Second line: the requests
+                requests = [str(x) for x in lines[1].split()]
+                
+                # Ensure we only process up to m requests if the line is longer
+                requests = requests[:m]
+
+                print(f"FIFO  : {FIFO(k, m, requests)}")
+                print(f"LRU   : {LRU(k, m, requests)}")
+                print(f"OPTFF : {OPTFF(k, m, requests)}")
+                print()
+        except Exception as e:
+            print(f"Error processing {filename}: {e}")
+
+if __name__ == "__main__":
+    run_benchmarks()
