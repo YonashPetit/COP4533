@@ -1,0 +1,39 @@
+--- ../tests/example.in ---
+FIFO  : 3
+LRU   : 3
+OPTFF : 3
+
+--- ../tests/test1.in ---
+FIFO  : 6
+LRU   : 6
+OPTFF : 4
+
+--- ../tests/test2.in ---
+FIFO  : 3
+LRU   : 3
+OPTFF : 3
+
+--- ../tests/test3.in ---
+FIFO  : 5
+LRU   : 5
+OPTFF : 4
+
+--- ../tests/test4.in ---
+FIFO  : 49
+LRU   : 49
+OPTFF : 34
+
+--- ../tests/test5.in ---
+FIFO  : 31
+LRU   : 31
+OPTFF : 24
+
+--- ../tests/test6.in ---
+FIFO  : 50
+LRU   : 50
+OPTFF : 45
+
+--- ../tests/test7.in ---
+FIFO  : 50
+LRU   : 50
+OPTFF : 16
