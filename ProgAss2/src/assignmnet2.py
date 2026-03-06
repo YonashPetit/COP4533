@@ -1,3 +1,6 @@
+import heapq
+from collections import deque, defaultdict
+
 class Node:
     def __init__(self, data):
         self.data = data  
@@ -14,7 +17,7 @@ def FIFO(k, m, requests):
         else:
             miss += 1
             if len(q) == k:
-                to_remove = q.pop(0)
+                to_remove = q.pop(0) #pretend this is a queue using a q library
                 hold.remove(to_remove)
             q.append(r)
             hold.add(r)
@@ -51,8 +54,39 @@ def LRU(k, m, requests):
         hold[r].prev = secondary
         hold["start"].prev = hold[r]
         hold[r].next = hold["start"]
-        
-        
+          
 def OPTFF(k, m, requests):
-    pass
+    cache = set()
+    heap = []
+    hit, misses = 0, 0
+    
+    #to make item -> array of index where it occur pair
+    fut_idx = defaultdict(deque)
+    for idx, item in enumerate(requests):
+        fut_idx[item].append(idx)
+
+    for i, item in enumerate(requests):
+        fut_idx[item].popleft()
+        if fut_idx[item]:
+            next_idx = fut_idx[item][0]  
+        else:
+            next_idx = float('inf')
+    
+        #update to next closest idx of same item if we hit
+        if item in cache:
+            hit += 1
+            heapq.heappush(heap, (-next_idx, item))
+        else:
+            misses += 1
+            if len(cache) >= k:
+                #we pop  the items with the furthest next_idx until we pop one that's in the cache
+                while True:
+                    furthest_idx, victim = heapq.heappop(heap)
+                    if victim in cache: # Check for stale heap entries
+                        cache.remove(victim)
+                        break
+            
+        # INSERT
+        cache.add(item)
+        heapq.heappush(heap, (-next_idx, item))
     
